@@ -1,0 +1,44 @@
+{
+  "id": "4018061",
+  "name": "youfa1",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "7213785",
+      "name": "Partner",
+      "font_class": "Partner",
+      "unicode": "e6aa",
+      "unicode_decimal": 59050
+    },
+    {
+      "icon_id": "212332",
+      "name": "group",
+      "font_class": "group",
+      "unicode": "e753",
+      "unicode_decimal": 59219
+    },
+    {
+      "icon_id": "5634344",
+      "name": "school",
+      "font_class": "school",
+      "unicode": "f0a7",
+      "unicode_decimal": 61607
+    },
+    {
+      "icon_id": "14629250",
+      "name": "quiz-slim",
+      "font_class": "quiz-slim",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
+      "icon_id": "27463896",
+      "name": "lawyer",
+      "font_class": "lawyer",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    }
+  ]
+}
