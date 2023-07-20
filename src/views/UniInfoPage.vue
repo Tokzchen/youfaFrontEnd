@@ -5,32 +5,45 @@
                 <el-row>
                     <el-col :span="8" :offset="0">
                         <div class="flex flex-col h-full items-center justify-center">
-                            <el-avatar icon="el-icon-user-solid" class="h-25 w-25" shape="circle" :src="null"
-                                fit="fill"></el-avatar>
+                            <el-upload v-if="hasNoAvatar"
+                             ref="uploadRef"
+                              class="upload-demo"
+                              :on-success="onUploadSuccess"
+                              :on-error="onUploadError"
+                                action="http://127.0.0.1:7071/api/university/avatarUpload" :auto-upload="true">
+                                <el-tooltip v-if="hasNoAvatar" class="box-item" effect="dark" content="点击上传头像" placement="right-end">
+                                    <el-avatar icon="el-icon-user-solid"
+                                        class="w-35 h-35 mt-15 cursor-pointer hover:bg-gray-400" shape="circle" :src="avatarUrl"
+                                        fit="fill">
+                                    </el-avatar>
+                                </el-tooltip>
+                            </el-upload>
                             <span class="text-2xl font-semibold mt-3">山河大学</span>
                         </div>
                     </el-col>
                     <el-col :span="16" :offset="0">
                         <div class="flex justify-around item-center h-40">
-                            <el-card shadow="never" :body-style="{ padding: '20px' }" class="flex items-center justify-center min-w-35 bg-blue-100" >
+                            <el-card shadow="never" :body-style="{ padding: '20px' }"
+                                class="flex items-center justify-center min-w-35 mt-20 min-h-30 bg-blue-100">
                                 <div class="flex flex-col justify-center items-center h-full">
                                     <span>Num</span>
                                     <span>desc</span>
                                 </div>
-                            </el-card> 
-                            <el-card shadow="never" :body-style="{ padding: '20px' }" class="flex items-center justify-center min-w-35 bg-blue-300" >
+                            </el-card>
+                            <el-card shadow="never" :body-style="{ padding: '20px' }"
+                                class="flex items-center justify-center min-w-35 mt-20 min-h-30 bg-blue-300">
                                 <div class="flex flex-col justify-center items-center h-full">
                                     <span>Num</span>
                                     <span>desc</span>
                                 </div>
-                            </el-card> 
-                            <el-card shadow="never" :body-style="{ padding: '20px' }" class="flex items-center  justify-center min-w-35 bg-blue-200" >
+                            </el-card>
+                            <el-card shadow="never" :body-style="{ padding: '20px' }"
+                                class="flex items-center  justify-center min-w-35 mt-20 min-h-30 bg-blue-200">
                                 <div class="flex flex-col justify-center items-center h-full">
                                     <span>Num</span>
                                     <span>desc</span>
                                 </div>
-                            </el-card> 
-
+                            </el-card>
                         </div>
                     </el-col>
                 </el-row>
@@ -91,9 +104,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const avatarUrl = '	https://i0.hdslb.com/bfs/face/f81887c8e9109ced8671…282f2e3dae47.jpg@160w_160h_1c_1s_!web-avatar.webp'
+
+const hasNoAvatar=ref(true)
 const infoList = ['1', '2', '3', '4', '5', '6']
 const recommendList = [1, 2, 3]
+const avatarUrl=ref(null)
 
 const rows = ref(computed(() => {
     let result = []
@@ -103,6 +118,23 @@ const rows = ref(computed(() => {
 
     return result
 }))
+
+//上传的两个钩子
+const onUploadSuccess=(res,file,fileList)=>{
+    if(res.flag){
+        notif('上传成功','success')
+        //更新avatar和相关信息
+        hasNoAvatar.value=false
+        avatarUrl.value=res.data
+    }else{
+        notif('上传失败，请联系人工客服解决','error')      
+    }
+
+}
+const onUploadError=(res,file,fileList)=>{
+    notif('上传失败,请联系人工客服解决','error')
+
+}
 
 
 const progress = [
@@ -150,7 +182,7 @@ const tableRowClassName = ({
     @apply bg-red-50;
 }
 
-:deep(.el-table){
+:deep(.el-table) {
     @apply bg-light-50;
 }
 </style>
