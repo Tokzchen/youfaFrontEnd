@@ -256,13 +256,19 @@ const handleLogin = () => {
     if(value){
       userLogin(form)
     .then(res => {
+      console.log(res)
       if (res.data.flag) {
         notif('登录成功', 'success')
         //将token存储到cookie当中
         console.log('得到的token:'+res.data.data)
         setToken(res.data.data)
         //跳转到测评页
-        router.push('/userInfo')
+        if(res.data.msg=='user'){
+          router.push('/userInfo')
+        }else{
+          router.push('/uniInfoPage')
+        }
+        
       } else {
         notif(res.data.msg, 'error')
         hanlechangeCheckCode()//刷新验证码

@@ -8,6 +8,7 @@
                             <el-upload v-if="hasNoAvatar"
                              ref="uploadRef"
                               class="upload-demo"
+                              :headers="headerObj"
                               :on-success="onUploadSuccess"
                               :on-error="onUploadError"
                                 action="http://127.0.0.1:7071/api/university/avatarUpload" :auto-upload="true">
@@ -102,8 +103,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-
+import { ref, reactive,computed,onMounted } from 'vue'
+import {notif} from '@/composable/utils.js'
+import {getToken} from '@/composable/auth.js'
+import { getAvatar } from '@/api/university';
+const headerObj=reactive({
+    token:getToken(),
+})
 
 const hasNoAvatar=ref(true)
 const infoList = ['1', '2', '3', '4', '5', '6']
@@ -121,6 +127,7 @@ const rows = ref(computed(() => {
 
 //上传的两个钩子
 const onUploadSuccess=(res,file,fileList)=>{
+    console.log(res)
     if(res.flag){
         notif('上传成功','success')
         //更新avatar和相关信息
@@ -175,6 +182,18 @@ const tableRowClassName = ({
     }
     return ''
 }
+
+onMounted(() => {
+  //挂载完之后，获取头像
+  getAvatar()
+     .then(res=>{
+        if(res.data.flag){
+            avatarUrl.value=res.data.data
+            
+        }
+     })
+
+})
 </script>
 
 <style  scoped>
