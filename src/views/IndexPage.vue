@@ -159,7 +159,7 @@ import FunctionCard from '@/components/FunctionCard.vue'
 import { checkCodeApi } from '@/api/quiz.js'
 import { useRouter } from 'vue-router'
 import { notif } from '@/composable/utils.js'
-import { userLogin,sendEmailCode,userRegistry,userResetPwd } from '@/api/account.js';
+import { userLogin,sendEmailCode,userRegistry,userResetPwd,getUserIdentity } from '@/api/account.js';
 import Verfify from '@/composable/verify.js'
 import { setToken,getToken } from '@/composable/auth';
 const checkCodeUrl = ref(checkCodeApi)
@@ -354,7 +354,15 @@ const moduleName=[{
 
 onMounted(() => {
   if(getToken()!=null&&getToken!=''){
-    router.push('/userInfo')
+    getUserIdentity()
+     .then(res=>{
+      console.log(res)
+      if(res.data.data=='user'){
+        router.push('/userInfo')
+      }else if(res.data.data=='university'){
+        router.push('/uniInfoPage')
+      }
+     })
   }
 })
 
