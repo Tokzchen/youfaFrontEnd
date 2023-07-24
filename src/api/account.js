@@ -48,3 +48,7 @@ export const userResetPwd=(options)=>{
 export const getUserIdentity=()=>{
     return axios.post('/user/identity')
 }
+
+export const getUserInfos=()=>{
+    return axios.post('/user/infos')
+}
