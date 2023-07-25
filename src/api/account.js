@@ -44,3 +44,11 @@ export const userResetPwd=(options)=>{
         emailCode,
     })
 }
+
+export const getUserIdentity=()=>{
+    return axios.post('/user/identity')
+}
+
+export const getUserInfos=()=>{
+    return axios.post('/user/infos')
+}
