@@ -11,7 +11,7 @@
           </el-input>
         </div>
         <div class="avatar">
-          <el-avatar :src="avatarUrl" />
+          <el-avatar class="cursor-pointer" @click="router.push('/userInfo')" :src="avatarUrl" />
         </div>
       </el-header>
       <hr>

@@ -105,7 +105,6 @@
             </el-form>
             
         </Dialog>
-        <el-button type="primary" size="default" @click="userStore.startTimer()"></el-button>
         
 
     </div>

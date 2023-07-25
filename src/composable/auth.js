@@ -3,6 +3,7 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 
 const tokenKey='login_token'
 const loginInfo='login_info'
+const location='login_location'
 const cookie=useCookies()
 const maxAge=60*60*24*3;
 
@@ -37,4 +38,19 @@ export function removeLoginInfo(){
 
 export async function getLoginInfo(){
    return await service.post('/user/identity')
+}
+
+
+export function setLoginLocation(obj){
+    cookie.set(location,JSON.stringify(obj),{
+        maxAge
+    })
+}
+
+export function getLoginLocation(){
+    return cookie.get(location)
+}
+
+export function removeLoginLocaion(){
+    cookie.remove(location)
 }

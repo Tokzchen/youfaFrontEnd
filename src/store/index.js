@@ -59,9 +59,9 @@ export const useUserStore=defineStore('userInfo',{
               }         
               // 设置定时器，每隔五分钟执行一次 updateUserInfo 方法
               this.timerId = setInterval(async () => {
-                await updateUserInfo();
+                await this.updateUserInfo();
                 console.log('执行了定时器')
-              }, 5 * 60 * 1000); // 5分钟的毫秒数
+              }, 15 * 60 * 1000); // 15分钟的毫秒数
             },
           
             stopTimer() {
