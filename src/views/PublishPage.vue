@@ -4,23 +4,70 @@
       <Navibars :publish="publish"></Navibars>
     </div>
     <hr>
-    <div class="editor">
-      <QuillEditor theme="snow" toolbar="full" v-model:content="content" ref="quill" placeholder="写点什么..."/>
-    </div>
+    <el-form :model="form">
+      <el-form-item required>
+        <el-input v-model="form.title" placeholder="请在这里输入标题..." />
+      </el-form-item>
+      <el-form-item required>
+        <mavon-editor v-model="form.content" :scrollStyle="scrollStyle" @imgAdd="imgAdd" @imgDel="deleteImage" ref="md" />
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from "vue";
 import Navibars from "../components/pulish/Navibars.vue";
-import { QuillEditor } from "@vueup/vue-quill";
-import axios from "axios";
-const quill = ref();
-let content = ref();
-let publish = ref(() => { // 发布保存逻辑
-  console.log(quill.value.getHTML());
-  axios.post('http://localhost:5306/')
+import * as qiniu from 'qiniu-js';
+import { getQiniuToekn } from '@/composable/utils'
+import service from "@/axios";
+import { notif, confirmDec } from '@/composable/utils'
+import { useRouter } from "vue-router";
+const router = useRouter();
+const scrollStyle = ref(true)
+const form = reactive({
+  title: '',
+  content: ''
 })
+const md = ref('')
+let publish = async () => { // 发布保存逻辑(异步)
+  if (form.title == '') {
+    confirmDec('为文章写个标题吧~',"error")
+  } else if (form.content == '') {
+    confirmDec('文章还没有内容~',"error")
+  } else {
+    service.post('/forum/article/save', {
+      title: form.title,
+      content: form.content
+    }).then(res => {
+      notif("文章发布成功~", "success")
+      router.push('/forum')  
+    }, err => {
+      notif("文章发布失败~", "error")
+    })
+  }
+
+}
+const domain = 'http://ry95tec7i.hb-bkt.clouddn.com/';
+const imgAdd = async (pos, file) => {
+  const date = new Date();
+  const key = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + '/' + file.name;
+  const token = await getQiniuToekn();
+  const observer = {
+    complete(res) {
+      setTimeout(() => { }, 100); // 给云端服务器一点时间，防止503
+      md.value.$img2Url(pos, domain + key);
+    }
+  }
+  const observable = qiniu.upload(file, key, token, {}, {})
+  observable.subscribe(observer)
+}
+const deleteImage = (ar) => {
+  const pos = ar[0].replace(domain, '')
+  service.post('/qiniu/delete?' + 'key=' + pos, {
+  })
+  console.log('del');
+}
 </script>
 
 <style scoped>
@@ -34,12 +81,30 @@ let publish = ref(() => { // 发布保存逻辑
   height: 80px;
 }
 
-.editor {
+.el-form {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   margin-left: 100px;
   margin-right: 100px;
+
 }
-:deep(.ql-snow) {
-  border: none !important
+
+.el-form-item:nth-child(1) {
+  margin: 0;
+}
+
+.el-form-item:nth-child(1) .el-input {
+  margin: 5px 0px;
+  font-size: large;
+}
+
+.el-form-item:nth-child(2) {
+  height: 620px;
+}
+
+.shadow.v-note-wrapper.markdown-body {
+  height: 100%;
+  width: 100%;
 }
 </style>

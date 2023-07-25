@@ -1,50 +1,69 @@
 <template>
     <div class="con">
-        <div class='main-bar'>
-            <el-button>综合</el-button>
-        </div>
+        <el-tabs class="demo-tabs" v-model="activeName" @tab-change="handleClick">
+            <el-tab-pane label="最新" name="/forum/article/get/new/pages"></el-tab-pane>
+            <el-tab-pane label="最老" name="/forum/article/get/pages"></el-tab-pane>
+        </el-tabs>
         <div class="main-content">
-
-            <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
-                <li v-for="i in count" :key="i" class="infinite-list-item" @click="jump">
+            <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto" :infinite-scroll-disabled="disabled">
+                <li v-for="item in items" :key="item.id" class="infinite-list-item" @click="jump(item)">
                     <div class="title">
-                        {{ i }}
+                        {{ item.title }}
                     </div>
                     <div class="content-footer">
                         <div>
                             <el-icon>
                                 <View />
                             </el-icon>
-                            <span> 100 </span>
+                            <span> </span>
                         </div>
-                        <span>autor</span>
+                        <span>{{ item.email }}</span>
                     </div>
                 </li>
             </ul>
-
         </div>
     </div>
 </template>
 
 <script  setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router';
-const count = ref(0)
-const load = () => {
-    count.value += 2
+import { ref } from 'vue';
+import service from '../../axios'
+import router from '@/router';
+let page = 0;
+let activeName = ref('/forum/article/get/new/pages');
+let items = ref([]);
+const disabled = ref(false)
+const handleClick = () => {
+    page = 0;
+    items.value = [];
+    load()
 }
-// const item =  接收数据
-const router = useRouter();
-const jump = () => {
+const load = () => {
+    disabled.value = true;
+    service.get(activeName.value + "?page=" + page).then(res => {
+        if (res.data.data.length != 0) {
+            page += 1;
+            disabled.value = false;
+            console.log(res.data.data);
+            items.value = items.value.concat(res.data.data)
+            if (items.value.length < 10) {
+                load();
+            }
+        }
+    }, err => {
+        console.log(err);
+    })
+}
+const jump = (item) => {
     router.push({
         name: 'ForumReaderPage',
         params: {
-            data: '<p>dsdsd<strong>dssds</strong></p><pre class="ql-syntax" spellcheck="false">sdsss',
+            title: item.title,
+            content: item.content
         }
     })
 }
 </script>
-
 <style scoped>
 .con {
     display: flex;
@@ -58,7 +77,7 @@ const jump = () => {
 }
 
 .infinite-list {
-    height: 700px;
+    height: 600px;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -86,6 +105,8 @@ const jump = () => {
     width: 100%;
     flex: 3;
     font-size: 20px;
+    line-height: 50px;
+    font-weight: 200;
 }
 
 .content-footer {

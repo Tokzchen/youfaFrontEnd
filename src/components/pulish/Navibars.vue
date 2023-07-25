@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
 import Logo from "../Logo.vue";
 
 const props = defineProps({
@@ -28,6 +29,6 @@ const props = defineProps({
 }
 
 .nav-button {
-    margin-right: 200px;
+    margin-right: 100px;
 }
 </style>

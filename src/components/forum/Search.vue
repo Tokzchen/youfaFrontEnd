@@ -19,6 +19,6 @@ const searchText = ref('')
 .con {
     margin: 0;
     width:400px;
-    margin-left: 400px;
+    margin-left: 300px;
 }
 </style>
