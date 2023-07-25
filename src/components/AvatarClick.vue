@@ -1,7 +1,6 @@
 <template>
   <div class="avatar-container">
     <div
-      class="avatar"
       @mouseenter="showTooltip = true"
       @mouseleave="showTooltip = false"
       @click="uploadImage"
