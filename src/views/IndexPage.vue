@@ -63,22 +63,12 @@
         </el-col>
         <el-col :span="10" :offset="0">
           <div class="min-h-screen flex flex-col justify-center">
-            <FunctionCard @click="$router.push('/admin')" v-for="(item, index) in moduleName" :key=index class="mb-2">
+            <FunctionCard @click="$router.push(item.path)" v-for="(item, index) in moduleName" :key=index class="mb-2">
               <el-row :gutter="20">
                 <el-col :span="7" :offset="0" class="flex items-center">
                   <div class="h-18  bg-blue-400 rounded flex items-center justify-center">
-                    <i v-if="item.name=='诉求测评'"
-                    class="iconfont icon-quiz-slim text-4xl
-                      font-bold mx-1"></i>
-                    <i v-if="item.name=='高校法援'"
-                    class="iconfont icon-school text-4xl
-                      font-bold mx-1"></i>
-                    <i v-if="item.name=='专业律师'"
-                    class="iconfont icon-lawyer text-4xl
-                      font-bold mx-1"></i>
-                    <i v-if="item.name=='优法社区'"
-                    class="iconfont icon-group text-5xl
-                      font-bold mx-1"></i>
+                    <i :class= "item.icon"></i>
+      
                   </div>
 
                 </el-col>
@@ -334,21 +324,29 @@ const rules = {
 
 const moduleName=[{
   name:'诉求测评',
-  desc:'如果您不知道做些什么，建议先做个测评。'
+  desc:'如果您不知道做些什么，建议先做个测评。',
+  path: '/admin',
+  icon: "iconfont icon-quiz-slim text-4xl font-bold mx-1",
 },{
   name:'高校法援',
-  desc:'低成本用法维权，降低您的经济负担。'
+  desc:'低成本用法维权，降低您的经济负担。',
+  path: '/university',
+  icon: "iconfont icon-school text-4xl font-bold mx-1",
 },{
   name:'专业律师',
-  desc:'一对一咨询帮助，提供最贴心准确的服务。'
+  desc:'一对一咨询帮助，提供最贴心准确的服务。',
+  path: '/admin',
+  icon: "iconfont icon-lawyer text-4xl font-bold mx-1",
 },{
   name:'优法社区',
-  desc:'寻找类似经历的伙伴，共同维权。'
+  desc:'寻找类似经历的伙伴，共同维权。',
+  path:'/forum',
+  icon: 'iconfont icon-group text-5xl font-bold mx-1'
 }]
 
 onMounted(() => {
   if(getToken()!=null&&getToken!=''){
-    router.push('/userInfo')
+    // router.push('/userInfo')
   }
 })
 
