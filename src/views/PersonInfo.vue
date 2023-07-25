@@ -2,23 +2,15 @@
     <div class="bg-blue-50 min-h-screen min-w-screen flex items-center justify-around">
         <div class="min-w-1/2 min-h-screen">
             <el-card shadow="never" :body-style="{ padding: '20px' }">
-                <div class="pageHeader flex">
-                    <el-upload ref="uploadRef" class="upload-demo" :headers="headerObj" :on-success="onUploadSuccess"
-                        :on-error="onUploadError" action="http://127.0.0.1:7071/api/user/avatarUpload" :auto-upload="true">
-                        <el-tooltip class="box-item" effect="dark" content="点击上传头像" placement="right-end">
-                            <el-avatar size="large" icon="el-icon-user-solid" class=" cursor-pointer hover:bg-gray-400"
-                                shape="circle" :src="avatarUrl" fit="fill">
-                            </el-avatar>
-                        </el-tooltip>
-                    </el-upload>
-
+                <div class="pageHeader flex">                   
+                    <PersonAvatar/>
                     <div class="flex flex-col justify-center ml-3">
                         <div class="flex items-center">
                             <div class="text-lg font-semibold cursor-pointer hover:bg-gray-200" @click="handleOpenDialog" >{{ userInfo.username }}</div>
-                            <el-icon v-if="userInfo.gender == 'male'" class="text-blue-500 text-lg ml-1">
+                            <el-icon v-if="userInfo.gender == '0'" class="text-blue-500 text-lg ml-1">
                                 <Male />
                             </el-icon>
-                            <el-icon v-if="userInfo.gender == 'female'" class="text-pink-500 text-lg ml-1">
+                            <el-icon v-if="userInfo.gender == '1'" class="text-pink-500 text-lg ml-1">
                                 <Female />
                             </el-icon>
                         </div>
@@ -100,10 +92,6 @@
                 </NotFound>
             </el-card>
 
-
-
-
-
         </div>
         <Dialog ref="dialogRef">
             <el-form :model="form" ref="form" :rules="rules" label-width="80px" :inline="false" size="normal">
@@ -117,13 +105,14 @@
             </el-form>
             
         </Dialog>
+        <el-button type="primary" size="default" @click="userStore.startTimer()"></el-button>
+        
 
     </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { MoreFilled, WarningFilled } from '@element-plus/icons-vue'
-import { getToken } from '@/composable/auth.js'
+import { ref, reactive, onMounted ,toRef} from 'vue'
+import {  WarningFilled } from '@element-plus/icons-vue'
 import { getUserInfos,changeUserInfos,changeUserInfosAcc } from '@/api/account.js'
 import { getLawAidInfoUser } from '@/api/lawAid.js'
 import { getLawAidSocialInfoUser1,getLawAidSocialInfoUser2,getSocialPostsCnt } from '@/api/social.js'
@@ -132,21 +121,21 @@ import { useRouter } from 'vue-router'
 import{notif} from '@/composable/utils.js'
 import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
+import PersonAvatar from '@/components/account/PersonAvatar.vue'
+import QiniuUpload from '@/components/QiniuUpload.vue'
+import { useUserStore } from '@/store'
+const userStore=useUserStore()
 const router = useRouter()
 const userInfo = reactive({
-    username: '默认用户',
+    username: toRef(userStore.userInfo,'username'),
     friendsCnt: 18,
     fansCnt: 18,
-    gender: 'male',
+    gender: toRef(userStore.userInfo,'gender'),
     helpsCnt: 2,
     collageInTouch: '山河大学',
     postCnt: 3,
     area: '民间借贷'
 
-})
-
-const headerObj = reactive({
-    token: getToken(),
 })
 
 const handleChangeArea=(item)=>{
@@ -181,11 +170,9 @@ const handleChangeName=()=>{
      })
 }
 
-
-const avatarUrl = ref(null)
 const items = [
     { name: '优法社区', desc: '找队友',route:'/forum' },
-    { name: '高校法援', desc: '免费求助' },
+    { name: '高校法援', desc: '免费求助' ,route:'/lawAid/apply'},
     { name: '专业律师', desc: '一对一解答' },
     { name: '诉求测评', desc: '了解维权进度', route: '/admin' }]
 const areas=ref([])
@@ -229,39 +216,11 @@ const activities = ref([
 ])
 
 
-//上传的两个钩子
-const onUploadSuccess = (res, file, fileList) => {
-    
-    if (res.flag) {
-        notif('上传成功', 'success')
-        //更新avatar和相关信息
-        avatarUrl.value = res.data
-    } else {
-        notif('上传失败，请联系人工客服解决', 'error')
-    }
 
-}
-const onUploadError = (res, file, fileList) => {
-    notif('上传失败,请联系人工客服解决', 'error')
-
-}
-
-//挂载完后去获取用户头像
-onMounted(() => {
+onMounted(async() => {
     //挂载完之后，获取头像,用户名等其他信息
-    getUserInfos()
-        .then(res => {
-            
-            if (res.data.flag) {
-                avatarUrl.value = res.data.data.avatar
-                userInfo.gender = res.data.data.gender == '0' ? 'male' : 'female'
-                userInfo.username = res.data.data.username == '' ? '未命名用户' : res.data.data.username
-            }
-        })
-        .catch(err => {
-
-        })
-
+    // userInfo.gender = userStore.userInfo.gender == '0' ? 'male' : 'female'
+    // userInfo.username = userStore.userInfo.username == '' ? '未命名用户' : userStore.userInfo.username
     getLawAidInfoUser()
         .then(res => {
             

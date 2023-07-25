@@ -152,6 +152,8 @@ import { notif } from '@/composable/utils.js'
 import { userLogin,sendEmailCode,userRegistry,userResetPwd,getUserIdentity } from '@/api/account.js';
 import Verfify from '@/composable/verify.js'
 import { setToken,getToken } from '@/composable/auth';
+import { useUserStore } from '@/store';
+const userStore=useUserStore()
 const checkCodeUrl = ref(checkCodeApi)
 const router=useRouter()
 const hanlechangeCheckCode = () => {
@@ -250,7 +252,6 @@ const handleLogin = () => {
       if (res.data.flag) {
         notif('登录成功', 'success')
         //将token存储到cookie当中
-        console.log('得到的token:'+res.data.data)
         setToken(res.data.data)
         //跳转到测评页
         if(res.data.msg=='user'){
@@ -265,6 +266,7 @@ const handleLogin = () => {
       }
     })
     .catch(err => {
+      console.log(err)
       notif('似乎发生了一些问题', 'error')
       hanlechangeCheckCode()//刷新验证码
     })
@@ -352,6 +354,7 @@ const moduleName=[{
 
 onMounted(() => {
   if(getToken()!=null&&getToken!=''){
+    userStore.initialStore()
     getUserIdentity()
      .then(res=>{
       console.log(res)

@@ -9,6 +9,7 @@ import UniInfoPage from '@/views/UniInfoPage.vue'
 import ForumPage from '@/views/ForumPage.vue'
 import PublishPage from '@/views/PublishPage.vue'
 import ForumReaderPage from '@/views/ForumReaderPage.vue'
+import LawAidApply from '@/views/LawAidApply.vue'
 const router = createRouter({
   // history: createWebHistory(import.meta.env.BASE_URL),
   history:createWebHashHistory(import.meta.env.BASH_URL),
@@ -80,7 +81,13 @@ const router = createRouter({
       name: 'ForumReaderPage',
       component: ForumReaderPage,
 
-    }
+    },
+    {
+      path:'/lawAid/apply',
+      name:'UserLawAidApply',
+      component:LawAidApply
+    },
+    
   
 
 
