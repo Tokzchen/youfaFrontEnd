@@ -14,7 +14,7 @@
 
                     <div class="flex flex-col justify-center ml-3">
                         <div class="flex items-center">
-                            <div class="text-lg font-semibold">{{ userInfo.username }}</div>
+                            <div class="text-lg font-semibold cursor-pointer hover:bg-gray-200" @click="handleChangeName" >{{ userInfo.username }}</div>
                             <el-icon v-if="userInfo.gender == 'male'" class="text-blue-500 text-lg ml-1">
                                 <Male />
                             </el-icon>
@@ -28,7 +28,17 @@
                 </div>
                 <div class="sec-Header flex justify-between items-center mt-8">
                     <div>
-                        <div class="text-xl font-semibold">{{ userInfo.area }}</div>
+                        
+                        <el-dropdown  trigger="click">
+                        <span class="el-dropdown-link">
+                            <span class="text-xl font-semibold">{{ userInfo.area }}</span><el-icon class="el-icon--right"><arrow-down /></el-icon>
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="(item,index) in areas" @click="handleChangeArea(item)">{{item.content}}</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                        </el-dropdown>
                         <div class="text-center text-sm">求助领域</div>
                     </div>
                     <div>
@@ -86,9 +96,8 @@
                         {{ activity.content }}
                     </el-timeline-item>
                 </el-timeline>
-                <NotFound v-if="activities.length==0||activities==null" fontSize="35"></NotFound>
-
-                <NotFound v-if="activities.length==0||activities==null" fontSize="35"></NotFound>
+                <NotFound v-for="i in [1, 2]" class="mt-15" v-if="activities.length == 0 || activities == null" fontSize="35">
+                </NotFound>
             </el-card>
 
 
@@ -103,11 +112,13 @@
 import { ref, reactive, onMounted } from 'vue'
 import { MoreFilled, WarningFilled } from '@element-plus/icons-vue'
 import { getToken } from '@/composable/auth.js'
-import { getUserInfos } from '@/api/account.js'
-import { getLawAidInfoUser } from '@/api/lawAid.js'
+import { getUserInfos,changeUserInfos } from '@/api/account.js'
+import { getLawAidInfoUser, getLawAidSocialInfoUser1,getLawAidSocialInfoUser2 } from '@/api/lawAid.js'
 import NotFound from '@/components/NotFound.vue'
-import{useRouter}from 'vue-router'
-const router=useRouter()
+import { useRouter } from 'vue-router'
+import{notif} from '@/composable/utils.js'
+import{getLawAidArea} from '@/api/quiz.js'
+const router = useRouter()
 const userInfo = reactive({
     username: '默认用户',
     friendsCnt: 18,
@@ -124,13 +135,27 @@ const headerObj = reactive({
     token: getToken(),
 })
 
+const handleChangeArea=(item)=>{
+    changeUserInfos({
+        area:item.content
+    }).then(res=>{
+        if(res.data.flag){
+            notif('修改成功','success')
+        }else{
+            notif('修改失败,建议联系客服','error')
+        }
+    })
+
+
+}
+
 const avatarUrl = ref(null)
 const items = [
     { name: '优法社区', desc: '找队友' },
     { name: '高校法援', desc: '免费求助' },
     { name: '专业律师', desc: '一对一解答' },
-    { name: '诉求测评', desc: '了解维权进度' ,route:'/admin'}]
-
+    { name: '诉求测评', desc: '了解维权进度', route: '/admin' }]
+const areas=ref([])
 
 const activities = ref([
     {
@@ -173,7 +198,7 @@ const activities = ref([
 
 //上传的两个钩子
 const onUploadSuccess = (res, file, fileList) => {
-    console.log(res)
+    
     if (res.flag) {
         notif('上传成功', 'success')
         //更新avatar和相关信息
@@ -193,7 +218,7 @@ onMounted(() => {
     //挂载完之后，获取头像,用户名等其他信息
     getUserInfos()
         .then(res => {
-            console.log(res)
+            
             if (res.data.flag) {
                 avatarUrl.value = res.data.data.avatar
                 userInfo.gender = res.data.data.gender == '0' ? 'male' : female
@@ -206,8 +231,7 @@ onMounted(() => {
 
     getLawAidInfoUser()
         .then(res => {
-            console.log('以下是法律援助模块的个人信息')
-            console.log(res)
+            
             const infoObj = res.data.data
             if (res.data.flag) {
                 userInfo.collageInTouch = infoObj.university == '' || infoObj.university == null ? '尚未选择' : res.data.data.university.uniName
@@ -246,7 +270,7 @@ onMounted(() => {
                         }
                         newActivity.push(activity)
                     }
-                    console.log(newActivity)
+                    
 
                     activities.value = newActivity
 
@@ -257,6 +281,24 @@ onMounted(() => {
 
         })
         .catch(err => {
+
+        })
+
+
+    getLawAidSocialInfoUser1()
+        .then(res => {
+            userInfo.fansCnt=res.data.data.length
+        })
+    getLawAidSocialInfoUser2()
+        .then(res=>{
+            userInfo.friendsCnt=res.data.data.length
+        })
+
+    getLawAidArea()
+        .then(res=>{
+            const areaArr=res.data.data
+            areas.value=areaArr
+        
 
         })
 
