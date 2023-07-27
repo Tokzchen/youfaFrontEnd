@@ -14,7 +14,7 @@
 
                     <div class="flex flex-col justify-center ml-3">
                         <div class="flex items-center">
-                            <div class="text-lg font-semibold cursor-pointer hover:bg-gray-200" @click="handleChangeName" >{{ userInfo.username }}</div>
+                            <div class="text-lg font-semibold cursor-pointer hover:bg-gray-200" @click="handleOpenDialog" >{{ userInfo.username }}</div>
                             <el-icon v-if="userInfo.gender == 'male'" class="text-blue-500 text-lg ml-1">
                                 <Male />
                             </el-icon>
@@ -105,6 +105,18 @@
 
 
         </div>
+        <Dialog ref="dialogRef">
+            <el-form :model="form" ref="form" :rules="rules" label-width="80px" :inline="false" size="normal">
+                <el-form-item label="新用户名">
+                    <el-input v-model="userInfo.username"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="handleChangeName">更改</el-button>
+                    <el-button class="ml-auto">取消</el-button>
+                </el-form-item>
+            </el-form>
+            
+        </Dialog>
 
     </div>
 </template>
@@ -112,12 +124,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { MoreFilled, WarningFilled } from '@element-plus/icons-vue'
 import { getToken } from '@/composable/auth.js'
-import { getUserInfos,changeUserInfos } from '@/api/account.js'
-import { getLawAidInfoUser, getLawAidSocialInfoUser1,getLawAidSocialInfoUser2 } from '@/api/lawAid.js'
+import { getUserInfos,changeUserInfos,changeUserInfosAcc } from '@/api/account.js'
+import { getLawAidInfoUser } from '@/api/lawAid.js'
+import { getLawAidSocialInfoUser1,getLawAidSocialInfoUser2,getSocialPostsCnt } from '@/api/social.js'
 import NotFound from '@/components/NotFound.vue'
 import { useRouter } from 'vue-router'
 import{notif} from '@/composable/utils.js'
 import{getLawAidArea} from '@/api/quiz.js'
+import Dialog from '@/components/Dialog.vue'
 const router = useRouter()
 const userInfo = reactive({
     username: '默认用户',
@@ -146,12 +160,31 @@ const handleChangeArea=(item)=>{
         }
     })
 
-
 }
+const dialogRef=ref(null)
+const handleOpenDialog=()=>{
+    dialogRef.value.openDialog()
+}
+const handleChangeName=()=>{
+    changeUserInfosAcc({username:userInfo.username})
+     .then(res=>{
+        if(res.data.flag){
+            notif('修改成功','success')
+            dialogRef.value.closeDialog()
+        }else{
+            notif('修改失败1','error')
+        }
+     })
+
+     .catch(err=>{
+        notif('修改失败2','error')
+     })
+}
+
 
 const avatarUrl = ref(null)
 const items = [
-    { name: '优法社区', desc: '找队友' },
+    { name: '优法社区', desc: '找队友',route:'/forum' },
     { name: '高校法援', desc: '免费求助' },
     { name: '专业律师', desc: '一对一解答' },
     { name: '诉求测评', desc: '了解维权进度', route: '/admin' }]
@@ -221,8 +254,8 @@ onMounted(() => {
             
             if (res.data.flag) {
                 avatarUrl.value = res.data.data.avatar
-                userInfo.gender = res.data.data.gender == '0' ? 'male' : female
-                userInfo.username = res.data.data.username == '' ? '未命名用户' : username
+                userInfo.gender = res.data.data.gender == '0' ? 'male' : 'female'
+                userInfo.username = res.data.data.username == '' ? '未命名用户' : res.data.data.username
             }
         })
         .catch(err => {
@@ -300,6 +333,11 @@ onMounted(() => {
             areas.value=areaArr
         
 
+        })
+    
+    getSocialPostsCnt()
+        .then(res=>{
+           userInfo.postCnt=res.data.data
         })
 
 })
