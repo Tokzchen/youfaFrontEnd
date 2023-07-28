@@ -14,15 +14,6 @@ export default defineConfig({
   },
   server:{
     hmr:true,
-    port:3004,
-    // proxy:{
-    //   "/api":{
-    //     target:'http://localhost:7071',
-    //     changeOrigin:true,
-    //     pathRewrite:{
-    //       '^api':'api',
-    //     }
-    //   }
-    // }
+    port:3005,
   }
 })

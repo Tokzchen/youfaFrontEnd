@@ -52,3 +52,11 @@ export const getUserIdentity=()=>{
 export const getUserInfos=()=>{
     return axios.post('/user/infos')
 }
+
+export const changeUserInfos=(obj)=>{
+    return axios.post('/user/change/infos',obj)
+}
+
+export const changeUserInfosAcc=(obj)=>{
+    return axios.post('/user/change/infos/acc',obj)
+}

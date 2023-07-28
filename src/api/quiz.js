@@ -21,3 +21,7 @@ export const usercontinueSurvey=(config)=>{
 export const getUserResult=()=>{
     return axios.get('/survey/result');
 }
+
+export const getLawAidArea=()=>{
+    return axios.get('/survey/areas')
+}
