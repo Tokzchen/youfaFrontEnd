@@ -11,6 +11,6 @@ const logoApi = loadLogo
 
 <style scoped>
 .ml-10.cursor-pointer {
-    margin: 100px;
+    margin-left: 100px;
 }
 </style>
