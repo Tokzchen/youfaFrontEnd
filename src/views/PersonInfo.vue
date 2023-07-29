@@ -105,6 +105,9 @@
             </el-form>
             
         </Dialog>
+        <QiniuUpload>
+            <el-button type="primary" size="default" @click="">上传</el-button>       
+        </QiniuUpload>
 
     </div>
 </template>
@@ -120,6 +123,7 @@ import{notif} from '@/composable/utils.js'
 import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
 import PersonAvatar from '@/components/account/PersonAvatar.vue'
+import QiniuUpload from '@/components/QiniuUpload.vue'
 const router = useRouter()
 const userInfo = reactive({
     username: '默认用户',
