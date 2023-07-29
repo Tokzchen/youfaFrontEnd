@@ -38,9 +38,8 @@ const handleFileSelect = async (event) => {
             console.log(token.value)  
             const observer = {
                 complete(res) {
-                    setTimeout(() => { }, 100); // 给云端服务器一点时间，防止503
-                    console.log('访问试试')
-                    console.log(domain + key)
+                    setTimeout(() => { }, 100); // 给云端服务器一点时间，防止503                    
+                    emit('uploadCompleted',domain+key)
                 }
             }
             const observable = qiniu.upload(file, key, token.value, {}, {})
@@ -49,6 +48,8 @@ const handleFileSelect = async (event) => {
         }
     }
 }
+//定义事件，上传完毕后触发，使用该组件的父组件可以监听以获取url
+const emit=defineEmits(['uploadCompleted'])
 
 </script>
 
