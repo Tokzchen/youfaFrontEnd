@@ -1,5 +1,13 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { useUserStore } from '@/store';
+import { onMounted } from 'vue';
+
+const userStore=useUserStore()
+onMounted(async() => {
+  if(userStore.needInitial){
+        await userStore.initialStore()
+    } 
+})
 </script>
 
 <template>

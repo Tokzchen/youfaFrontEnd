@@ -7,10 +7,10 @@
                     <div class="flex flex-col justify-center ml-3">
                         <div class="flex items-center">
                             <div class="text-lg font-semibold cursor-pointer hover:bg-gray-200" @click="handleOpenDialog" >{{ userInfo.username }}</div>
-                            <el-icon v-if="userInfo.gender == 'male'" class="text-blue-500 text-lg ml-1">
+                            <el-icon v-if="userInfo.gender == '0'" class="text-blue-500 text-lg ml-1">
                                 <Male />
                             </el-icon>
-                            <el-icon v-if="userInfo.gender == 'female'" class="text-pink-500 text-lg ml-1">
+                            <el-icon v-if="userInfo.gender == '1'" class="text-pink-500 text-lg ml-1">
                                 <Female />
                             </el-icon>
                         </div>
@@ -105,14 +105,13 @@
             </el-form>
             
         </Dialog>
-        <QiniuUpload>
-            <el-button type="primary" size="default" @click="">上传</el-button>       
-        </QiniuUpload>
+        <el-button type="primary" size="default" @click="userStore.startTimer()"></el-button>
+        
 
     </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted ,toRef} from 'vue'
 import {  WarningFilled } from '@element-plus/icons-vue'
 import { getUserInfos,changeUserInfos,changeUserInfosAcc } from '@/api/account.js'
 import { getLawAidInfoUser } from '@/api/lawAid.js'
@@ -124,12 +123,14 @@ import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
 import PersonAvatar from '@/components/account/PersonAvatar.vue'
 import QiniuUpload from '@/components/QiniuUpload.vue'
+import { useUserStore } from '@/store'
+const userStore=useUserStore()
 const router = useRouter()
 const userInfo = reactive({
-    username: '默认用户',
+    username: toRef(userStore.userInfo,'username'),
     friendsCnt: 18,
     fansCnt: 18,
-    gender: 'male',
+    gender: toRef(userStore.userInfo,'gender'),
     helpsCnt: 2,
     collageInTouch: '山河大学',
     postCnt: 3,
@@ -216,20 +217,10 @@ const activities = ref([
 
 
 
-onMounted(() => {
+onMounted(async() => {
     //挂载完之后，获取头像,用户名等其他信息
-    getUserInfos()
-        .then(res => {
-            
-            if (res.data.flag) {
-                userInfo.gender = res.data.data.gender == '0' ? 'male' : 'female'
-                userInfo.username = res.data.data.username == '' ? '未命名用户' : res.data.data.username
-            }
-        })
-        .catch(err => {
-
-        })
-
+    // userInfo.gender = userStore.userInfo.gender == '0' ? 'male' : 'female'
+    // userInfo.username = userStore.userInfo.username == '' ? '未命名用户' : userStore.userInfo.username
     getLawAidInfoUser()
         .then(res => {
             
