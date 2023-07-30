@@ -10,8 +10,8 @@
             </template>
           </el-input>
         </div>
-        <div>
-          <Avatar></Avatar>
+        <div class="avatar">
+          <el-avatar :src="avatarUrl" />
         </div>
       </el-header>
       <hr>
@@ -52,18 +52,19 @@
 </template>
 <script setup>
 import Logo from '@/components/Logo.vue'
-import Avatar from '@/components/AvatarClick.vue';
+import { getAvatar } from '@/api/account';
 import SideBar from "@/components/forum/SideBar.vue";
 import { Search } from '@element-plus/icons-vue'
 import { onMounted, ref } from 'vue';
 import service from '@/axios'
 import router from '@/router';
-let id = ref('');
-let otherValue = ref('');
-let sortTag = ref('1');
-let key = ref('');
-let path = ref('');
-let items = ref([]);
+const id = ref('');
+const otherValue = ref('');
+const sortTag = ref('1');
+const key = ref('');
+const path = ref('');
+const items = ref([]);
+const avatarUrl = ref('')
 const disabled = ref(false)
 const handleClick = () => {
   items.value = [];
@@ -73,14 +74,11 @@ const handleClick = () => {
 }
 
 const load = () => {
-  if (sessionStorage.getItem("sortTag")) {
-    items.value = JSON.parse(sessionStorage.getItem("articles"))
+  if (sessionStorage.getItem("sortTag")) {  // 跳转后保存原页面数据
     sortTag.value = JSON.parse(sessionStorage.getItem("sortTag"))
     key.value = JSON.parse(sessionStorage.getItem("key"))
     sessionStorage.removeItem("sortTag")
-    sessionStorage.removeItem("articles")
     sessionStorage.removeItem("key")
-    return
   }
   disabled.value = true;
   if (id.value == '') {
@@ -105,22 +103,32 @@ const load = () => {
   })
 }
 const jump = (item) => {
-  sessionStorage.setItem('articles', JSON.stringify(items.value));
   sessionStorage.setItem('key', JSON.stringify(key.value));
   sessionStorage.setItem('sortTag', JSON.stringify(sortTag.value));
-  
+  console.log(item);
   router.push({
     name: 'ForumReaderPage',
     params: {
-      title: item.title,
-      content: item.content,
-      email: item.email
+      id: item.id 
     }
   })
 }
+onMounted(async () => {
+  //挂载完之后，获取头像
+  avatarUrl.value = await getAvatar()
+  console.log(avatarUrl.value);
+  
+
+})
 </script>
 
 <style scoped>
+.avatar {
+  margin-right: 100px;
+  width: 50px;
+  height: 50px;
+}
+
 .common-layout,
 .el-container {
   height: 100%;
@@ -131,6 +139,7 @@ const jump = (item) => {
   height: 100px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .el-aside {
@@ -154,7 +163,7 @@ const jump = (item) => {
 .search {
   margin: 0;
   width: 400px;
-  margin-left: 300px;
+  margin-left: 100px;
 }
 
 .el-main {
@@ -210,4 +219,4 @@ const jump = (item) => {
   font-size: 13px;
   color: rgb(206, 206, 201);
 }
-</style>@/store/forumstore
+</style>

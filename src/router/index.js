@@ -76,7 +76,7 @@ const router = createRouter({
       component: PublishPage
     },
     {
-      path: '/forum/reader/:title/:content',
+      path: '/forum/reader/:id',
       name: 'ForumReaderPage',
       component: ForumReaderPage,
 

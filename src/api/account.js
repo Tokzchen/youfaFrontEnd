@@ -60,3 +60,8 @@ export const changeUserInfos=(obj)=>{
 export const changeUserInfosAcc=(obj)=>{
     return axios.post('/user/change/infos/acc',obj)
 }
+export const getAvatar= async ()=>{
+    
+    const res = await axios.post('/user/getAvatar',{})
+    return res.data.data;
+}

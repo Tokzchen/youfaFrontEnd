@@ -1,3 +1,4 @@
+import service from '@/axios';
 import { useCookies } from '@vueuse/integrations/useCookies'
 
 const tokenKey='login_token'
@@ -34,6 +35,6 @@ export function removeLoginInfo(){
     cookie.remove(loginInfo)
 }
 
-export function getLoginInfo(){
-    cookie.get(loginInfo)
+export async function getLoginInfo(){
+   return await service.post('/user/identity')
 }
