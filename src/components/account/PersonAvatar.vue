@@ -9,11 +9,13 @@
 </template>
 
 <script setup>
-import {ref,reactive,onMounted} from 'vue'
+import {ref,reactive,onMounted,toRef} from 'vue'
 import { getToken } from '@/composable/auth.js'
 import { getUserInfos,changeUserInfosAcc } from '@/api/account.js'
 import QiniuUpload from '../QiniuUpload.vue'
 import { notif } from '@/composable/utils'
+import { useUserStore } from '@/store'
+const userStore=useUserStore()
 const uploadRef=ref(null)
 const headerObj = reactive({
     token: getToken(),
@@ -35,18 +37,12 @@ const onUploadError = (res, file, fileList) => {
     notif('上传失败,请联系人工客服解决', 'error')
 
 }
-onMounted(() => {
+onMounted(async() => {
     //挂载完之后，获取头像,用户名等其他信息
-    getUserInfos()
-        .then(res => {            
-            if (res.data.flag) {
-                avatarUrl.value = res.data.data.avatar
-            }
-        })
-        .catch(err => {
-
-        })
-        
+    if(userStore.needInitial){
+        await userStore.initialStore()
+    }
+    avatarUrl.value=userStore.userInfo.avatar      
     })
 
     const handleUploadCompleted=async (url)=>{

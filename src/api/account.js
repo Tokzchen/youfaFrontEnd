@@ -65,3 +65,8 @@ export const getAvatar= async ()=>{
     const res = await axios.post('/user/getAvatar',{})
     return res.data.data;
 }
+
+
+export const getUserInfo2=(obj)=>{
+    return axios.post('/user/infos/email',obj)
+}
