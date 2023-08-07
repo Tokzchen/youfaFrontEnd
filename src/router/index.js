@@ -7,12 +7,15 @@ import { getToken } from '@/composable/auth'
 import UniJoinPage from '@/views/UniJoinPage.vue'
 import UniInfoPage from '@/views/UniInfoPage.vue'
 import ForumPage from '@/views/ForumPage.vue'
-import PublishPage from '@/views/PublishPage.vue'
+import MyForumPage from '@/views/MyForumPage.vue'
+import PublishArticlePage from '@/views/PublishArticlePage.vue'
+import UpdateArticlePage from '@/views/UpdateArticlePage.vue'
 import ForumReaderPage from '@/views/ForumReaderPage.vue'
 import LawAidApply from '@/views/LawAidApply.vue'
+import MyForumPageVue from '@/views/MyForumPage.vue'
 const router = createRouter({
   // history: createWebHistory(import.meta.env.BASE_URL),
-  history:createWebHashHistory(import.meta.env.BASH_URL),
+  history: createWebHashHistory(import.meta.env.BASH_URL),
 
   routes: [
     {
@@ -69,12 +72,23 @@ const router = createRouter({
       path: '/forum',
       name: 'forum',
       component: ForumPage,
-  
+
+    },
+    {
+      path: '/forum/my',
+      name: 'myForum',
+      component: MyForumPage,
+
     },
     {
       path: '/forum/publish',
       name: 'Publish',
-      component: PublishPage
+      component: PublishArticlePage
+    },
+    {
+      path: '/forum/update/:id',
+      name: 'updateArticlePage',
+      component: UpdateArticlePage
     },
     {
       path: '/forum/reader/:id',
@@ -83,12 +97,12 @@ const router = createRouter({
 
     },
     {
-      path:'/lawAid/apply',
-      name:'UserLawAidApply',
-      component:LawAidApply
+      path: '/lawAid/apply',
+      name: 'UserLawAidApply',
+      component: LawAidApply
     },
-    
-  
+
+
 
 
 

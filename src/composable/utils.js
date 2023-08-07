@@ -44,3 +44,14 @@ export async function  getQiniuToekn() {
         })
     return token;
 }
+export function buttonReset (e){ // 按钮按下，鼠标离开时回复原有样式(针对el-button)
+    let target = e.target;
+    if (target.nodeName == "SPAN") {
+      target = e.target.parentNode;
+    }
+    target.blur(); // 按钮样式
+}
+ export function formatTime (time){
+    const date = new Date(time);
+    return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+  }
