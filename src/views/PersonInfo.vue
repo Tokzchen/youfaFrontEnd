@@ -64,7 +64,7 @@
                             class="iconfont icon-lawyer text-3xl text-blue-500 font-bold mx-1"></i>
                         <i v-if="item.name == '诉求测评'"
                             class="iconfont icon-quiz-slim text-3xl text-blue-500 font-bold mx-1"></i>
-                        <div class="flex flex-col items-center ml-1" @click="router.push(item.route)">
+                        <div class="flex flex-col items-center ml-1" @click="handlePageSwitch(item.route,item.name)">
                             <span class="font-semibold text-gray-500">{{ item.name }}</span>
                             <span class="text-gray-500">{{ item.desc }}</span>
                         </div>
@@ -117,11 +117,10 @@ import { getLawAidInfoUser } from '@/api/lawAid.js'
 import { getLawAidSocialInfoUser1,getLawAidSocialInfoUser2,getSocialPostsCnt } from '@/api/social.js'
 import NotFound from '@/components/NotFound.vue'
 import { useRouter } from 'vue-router'
-import{notif} from '@/composable/utils.js'
+import{notif,confirmDec} from '@/composable/utils.js'
 import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
 import PersonAvatar from '@/components/account/PersonAvatar.vue'
-import QiniuUpload from '@/components/QiniuUpload.vue'
 import { useUserStore } from '@/store'
 const userStore=useUserStore()
 const router = useRouter()
@@ -167,6 +166,19 @@ const handleChangeName=()=>{
      .catch(err=>{
         notif('修改失败2','error')
      })
+}
+
+const handlePageSwitch=(route,name)=>{
+    if(name=='高校法援'){
+        confirmDec('将为您实现个性化法律援助推荐，该功能可能需要耗费一些时间，是否开始？',
+        'warning','提示')
+            .then(res=>{
+                router.push(route)
+            })
+
+    }else{
+        router.push(route)
+    }
 }
 
 const items = [
