@@ -16,32 +16,36 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import {  reactive, ref } from "vue";
 import Navibars from "../components/pulish/Navibars.vue";
 import * as qiniu from 'qiniu-js';
 import { getQiniuToekn } from '@/composable/utils'
 import service from "@/axios";
 import { notif, confirmDec } from '@/composable/utils'
-import { useRouter } from "vue-router";
+import { useRouter,useRoute } from "vue-router";
 const router = useRouter();
+const route = useRoute();
 const scrollStyle = ref(true)
 const form = reactive({
   title: '',
   content: ''
 })
 const md = ref('')
+const isShow = ref(false)
 let publish = async () => { // 发布保存逻辑(异步)
   if (form.title == '') {
-    confirmDec('为文章写个标题吧~',"error")
+    confirmDec('为文章写个标题吧~', "error")
   } else if (form.content == '') {
-    confirmDec('文章还没有内容~',"error")
+    confirmDec('文章还没有内容~', "error")
   } else {
     service.post('/forum/article/save', {
       title: form.title,
-      content: form.content
+      content:form.content
     }).then(res => {
+      setTimeout(() => {
+        router.push('/forum')
+      }, 1000)  // 保证es成功添加到文章
       notif("文章发布成功~", "success")
-      router.push('/forum')  
     }, err => {
       notif("文章发布失败~", "error")
     })
@@ -66,7 +70,6 @@ const deleteImage = (ar) => {
   const pos = ar[0].replace(domain, '')
   service.post('/qiniu/delete?' + 'key=' + pos, {
   })
-  console.log('del');
 }
 </script>
 

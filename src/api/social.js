@@ -2,13 +2,13 @@ import axios from '@/axios.js'
 
 
 export const getLawAidSocialInfoUser1=()=>{
-    return axios.get('/forum/user/get/followers')
+    return axios.get('/follow/get/followers')
 }
 
 export const getLawAidSocialInfoUser2=()=>{
-    return axios.get('/forum/user/get/following')
+    return axios.get('/follow/get/followees')
 }
 
 export const getSocialPostsCnt=()=>{
-    return axios.get('/forum/user/get/article/count')
+    return axios.get('/forum/article/get/count')
 }

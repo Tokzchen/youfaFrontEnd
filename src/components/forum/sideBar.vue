@@ -7,19 +7,25 @@
 </template>
 
 <script setup>
-const a = [{
-    title: '发布',
-    path: '/forum/publish'
-}, {
-    title: '我的',
-    path: '/forum'
-}]
+const a = [
+    {
+        title: '所有',
+        path: '/forum'
+    },
+    {
+        title: '发布',
+        path: '/forum/publish'
+    },
+    {
+        title: '我的',
+        path: '/forum/my'
+    }
+]
 </script>
 
 <style scoped>
 .text.item {
     margin: 0;
-
 }
 
 
@@ -29,5 +35,4 @@ const a = [{
     border: none;
     display: flex;
 }
-
 </style>

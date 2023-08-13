@@ -11,7 +11,7 @@
           </el-input>
         </div>
         <div class="avatar">
-          <el-avatar class="cursor-pointer" @click="router.push('/userInfo')" :src="avatarUrl" />
+          <el-avatar :src="avatarUrl" />
         </div>
       </el-header>
       <hr>
@@ -34,7 +34,7 @@
                   {{ item.title }}
                 </div>
                 <div class="content-footer">
-                  <div class="like_icon">
+                  <div class="like_icon"> 
                     <el-icon><Lollipop /></el-icon>
                     &nbsp;
                     <span>{{item.like}}</span>
@@ -55,9 +55,9 @@ import { getAvatar } from '@/api/account';
 import SideBar from "@/components/forum/sideBar.vue";
 import { Search } from '@element-plus/icons-vue'
 import { onMounted, ref } from 'vue';
+import {formatTime} from '@/composable/utils';
 import service from '@/axios'
 import router from '@/router';
-import {formatTime} from '@/composable/utils';
 const id = ref('');
 const otherValue = ref('');
 const sortTag = ref('1');
@@ -71,13 +71,15 @@ const handleClick = () => {
   id.value = '';
   otherValue.value = '';
   load();
+  console.log("handCCC");
 }
+
 const load = () => {
   disabled.value = true;
   if (id.value == '') {
-    path.value = "/forum/article/get/pages?" + "flag=" + sortTag.value + "&key=" + key.value;
+    path.value = "/forum/article/get/my/pages?" + "flag=" + sortTag.value + "&key=" + key.value;
   } else {
-    path.value = "/forum/article/get/pages?" + "flag=" + sortTag.value + "&id=" + id.value + "&otherValue=" + otherValue.value + "&key=" + key.value;
+    path.value = "/forum/article/get/my/pages?" + "flag=" + sortTag.value + "&id=" + id.value + "&otherValue=" + otherValue.value + "&key=" + key.value;
   }
   service.get(path.value).then(res => {
     const data = res.data.data;
@@ -106,6 +108,7 @@ onMounted(async () => {
   //挂载完之后，获取头像
   avatarUrl.value = await getAvatar()
   console.log(avatarUrl.value);
+  
 
 })
 </script>
