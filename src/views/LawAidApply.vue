@@ -19,10 +19,13 @@ const uniList=ref([])
 const lawAidMainRef=ref(null)
 
 onMounted(async()=>{
- const res=await Utils.getCurrentPosition()
- const locationInfo={
+ const locationInfo= getLoginLocation()
+ if(locationInfo==null){
+  const res=await Utils.getCurrentPosition()
+  locationInfo={
   lng:res.position.lng,
   lat:res.position.lat
+ }
  }
  //向后端登记位置信息
  const result=await signCurrentUserLocation(locationInfo)
@@ -39,7 +42,6 @@ onMounted(async()=>{
 
  //向cookie存储位置信息
  setLoginLocation(locationInfo)
- const obj=getLoginLocation()
  }
 
 

@@ -6,6 +6,7 @@ const loginInfo='login_info'
 const location='login_location'
 const cookie=useCookies()
 const maxAge=60*60*24*3;
+const loacationAge=60*60*3;
 
 export function getToken(){
     return cookie.get(tokenKey)
@@ -43,7 +44,7 @@ export async function getLoginInfo(){
 
 export function setLoginLocation(obj){
     cookie.set(location,JSON.stringify(obj),{
-        maxAge
+        loacationAge
     })
 }
 
