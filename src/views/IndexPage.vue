@@ -149,10 +149,11 @@ import FunctionCard from '@/components/FunctionCard.vue'
 import { checkCodeApi } from '@/api/quiz.js'
 import { useRouter } from 'vue-router'
 import { notif } from '@/composable/utils.js'
-import { userLogin,sendEmailCode,userRegistry,userResetPwd,getUserIdentity } from '@/api/account.js';
+import { userLogin,sendEmailCode,userRegistry,userResetPwd,getUserIdentity, getUserInfos } from '@/api/account.js';
 import Verfify from '@/composable/verify.js'
-import { setToken,getToken } from '@/composable/auth';
+import { setToken,getToken,saveIdentity,saveCurrentInfo } from '@/composable/auth';
 import { useUserStore } from '@/store';
+import {getUniInfo} from '@/api/university.js'
 const userStore=useUserStore()
 const checkCodeUrl = ref(checkCodeApi)
 const router=useRouter()
@@ -243,11 +244,11 @@ const resetForm=()=>{
 
 const loginFormRef=ref(null)
 
-const handleLogin = () => {
+const handleLogin =  () => {
   loginFormRef.value.validate(value=>{
     if(value){
       userLogin(form)
-    .then(res => {
+    .then(async(res) => {
       console.log(res)
       if (res.data.flag) {
         notif('登录成功', 'success')
@@ -255,8 +256,14 @@ const handleLogin = () => {
         setToken(res.data.data)
         //跳转到测评页
         if(res.data.msg=='user'){
+          //获取用户信息
+          const res=await getUserInfos()
+          saveCurrentInfo(res.data.data)
           router.push('/userInfo')
         }else{
+          const res=await getUniInfo()
+          console.log(res)
+          saveCurrentInfo(res.data.data)
           router.push('/uniInfoPage')
         }
         
@@ -359,9 +366,11 @@ onMounted(() => {
      .then(res=>{
       console.log(res)
       if(res.data.data=='user'){
+        saveIdentity("user")
         router.push('/userInfo')
       }else if(res.data.data=='university'){
         router.push('/uniInfoPage')
+        saveIdentity("user")
       }
      })
   }

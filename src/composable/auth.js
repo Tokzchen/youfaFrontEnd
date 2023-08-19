@@ -1,9 +1,10 @@
 import service from '@/axios';
 import { useCookies } from '@vueuse/integrations/useCookies'
-
 const tokenKey='login_token'
 const loginInfo='login_info'
 const location='login_location'
+const identity='login_identity'
+const curInfo='cur_info'
 const cookie=useCookies()
 const maxAge=60*60*24*3;
 const loacationAge=60*60*3;
@@ -55,3 +56,24 @@ export function getLoginLocation(){
 export function removeLoginLocaion(){
     cookie.remove(location)
 }
+//用户身份标识
+export function saveIdentity(str){
+    cookie.set(identity,str,{
+        maxAge
+    })
+}
+
+export function getIdentity(){
+    cookie.get(identity)
+}
+//用户实体的身份信息
+export function saveCurrentInfo(obj){
+    cookie.set(curInfo,JSON.stringify(obj),{
+        maxAge
+    })
+}
+
+export function getCurrentInfo(){
+    return cookie.get(curInfo)
+}
+
