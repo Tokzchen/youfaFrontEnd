@@ -39,7 +39,7 @@
                     &nbsp;
                     <span>{{item.like}}</span>
                   </div>
-                  <span>{{ formatTime(item.updateTime) }}</span>
+                  <span>{{ item.updateTime}}</span>
                 </div>
               </li>
             </ul>

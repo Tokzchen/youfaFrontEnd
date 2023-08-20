@@ -53,5 +53,6 @@ export function buttonReset (e){ // 按钮按下，鼠标离开时回复原有�
 }
  export function formatTime (time){
     const date = new Date(time);
+    console.log(date);
     return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
   }
