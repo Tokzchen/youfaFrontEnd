@@ -15,3 +15,12 @@ export const userApplyUniLawAid= (obj)=>{
         uniId
     })
 }
+
+export const getUniLawAidInfo=()=>{
+    return axios.get('/lawAid/university/info')
+}
+
+
+export const uniAcceptLawAid=(obj)=>{
+    return axios.post('/lawAid/university/accept',obj)
+}

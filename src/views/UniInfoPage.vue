@@ -14,21 +14,21 @@
                             <el-card shadow="hover" :body-style="{ padding: '20px' }"
                                 class="flex items-center justify-center min-w-35 min-h-35 bg-blue-100">
                                 <div class="flex flex-col justify-center items-center h-full">
-                                    <span class="text-4xl">{{lawAidInfoPageUni.curLawAid}}</span>
+                                    <span class="text-4xl">{{lawAidInfoPageUni.userConfirmed.length}}</span>
                                     <span>正在处理法援案量</span>
                                 </div>
                             </el-card>
                             <el-card shadow="hover" :body-style="{ padding: '20px' }"
                                 class="flex items-center justify-center min-w-35  min-h-35 bg-blue-300">
                                 <div class="flex flex-col justify-center items-center h-full">
-                                    <span class="text-4xl">{{lawAidInfoPageUni.lawAidToConfirm}}</span>
+                                    <span class="text-4xl">{{lawAidInfoPageUni.usersToConfirm.length}}</span>
                                     <span>待确认法援申请</span>
                                 </div>
                             </el-card>
                             <el-card shadow="hover" :body-style="{ padding: '20px' }"
                                 class="flex items-center  justify-center min-w-35  min-h-35 bg-blue-200">
                                 <div class="flex flex-col justify-center items-center h-full">
-                                    <span class="text-4xl">{{lawAidInfoPageUni.totalLawAid}}</span>
+                                    <span class="text-4xl">{{lawAidInfoPageUni.totalLawAids.length}}</span>
                                     <span>历史完成法援案量</span>
                                 </div>
                             </el-card>
@@ -38,33 +38,33 @@
             </div>
             <div class="w-full bg-light-50">
                 <div class="recommendBox flex items-center justify-around mt-10">
-                    <div  v-for="(item, index) in recommendList" :key="index"
+                    <div  v-for="(item, index) in lawAidInfoPageUni.usersToConfirm" :key="index"
                         class="singleRecommend flex flex-col items-center">
                         <el-card class="cursor-pointer min-w-80 bg-blue-50 " shadow="hover">
                             <div class="flex justify-around items-center">
                                 <el-avatar icon="el-icon-user-solid" class="h-20 w-20"
-                                    shape="square" :src="null" fit="fill">
+                                    shape="square" :src="item.avatar" fit="fill">
                                 </el-avatar>
                                 <div class="flex flex-col items-center">
-                                    <div class="text-xl font-semibold">陈得柱</div>
-                                    <div class="mt-2">民间借贷纠纷</div>
+                                    <div class="text-xl font-semibold">{{item.username}}</div>
+                                    <div class="mt-2">{{ item.area }}</div>
                                 </div>
                             </div>
                             <div class="mt-2">
                                 <div class="flex">
-                                    <span class="w-40">省份：广东</span>
-                                    <span class="ml-7">城市：广州</span>
+                                    <span class="w-40">省份：{{item.province}}</span>
+                                    <span class="ml-7">城市：{{item.city}}</span>
                                 </div>
                                 <div class="flex">
-                                    <span class="w-40">电话：<span class="text-xs">12345678912</span></span>
-                                    <span class="ml-7">邮箱：<span class="text-xs">test@qq.com</span></span>
+                                    <span class="w-40">电话：<span class="text-xs">{{item.phone}}</span></span>
+                                    <span class="ml-7">邮箱：<span class="text-xs">{{item.email}}</span></span>
                                 </div>
                                 <div>
-                                    申请日期：<span class="text-xs">2023-8-18</span>
+                                    申请日期：<span class="text-xs">{{ item.createTime }}</span>
                                 </div>
                                 <div class="flex justify-around mt-2">
-                                    <el-button type="primary" size="default" @click="">详情</el-button>
-                                    <el-button type="success" size="default" @click="">选择</el-button>             
+                                    <el-button type="warning" size="default" @click="handleRejectLawAid">拒绝</el-button>
+                                    <el-button type="success" size="default" @click="handleAcceptLawAid(item)">同意</el-button>             
                                 </div>
 
                             </div>
@@ -91,38 +91,47 @@
             <div class="mt-3">
                 <div class="h-[1px] bg-blue-400 mb-5"></div>
                 <el-table class="bg-blue-100" :data="progress" style="width: 100%" :row-class-name="tableRowClassName">
-                    <el-table-column prop="name" label="姓名" width="180" />
+                    <el-table-column prop="username" label="姓名" width="180" />
                     <el-table-column prop="area" label="援助类型" width="180" />
-                    <el-table-column prop="latestOperation" label="最近处理" width="180" />
-                    <el-table-column prop="latestOperationTime" label="最近处理时间" width="180" />
-                    <el-table-column prop="status" label="状态" width="180" />
+                    <el-table-column prop="province" label="省份" width="180" />
+                    <el-table-column prop="city" label="城市" width="180" />
+                    <el-table-column prop="email" label="邮箱" width="180" />
                     <el-table-column prop="status" label="操作" width="180">
                         <template #default>
-                            <el-button link type="primary" size="small" @click="handleClick">详情</el-button>
+                            <el-button link type="primary" size="small" @click="handleLawAidDetailed">详情</el-button>
                             <el-button link type="primary" size="small">处理</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </div>
         </div>
+        <Dialog ref="lawAidDialogRef" title="援助进度">
+            <div class="w-full h-full">
+                进度条
+            </div>
+        </Dialog>
     </div>
 </template>
 
 <script setup>
 import PersonAvatar from '@/components/account/PersonAvatar.vue';
 import { ref, reactive,computed,onMounted } from 'vue'
-import {notif} from '@/composable/utils.js'
+import {confirmDec, notif} from '@/composable/utils.js'
 import {getToken} from '@/composable/auth.js'
 import { getAvatar } from '@/api/university';
 import {updateUniInfo} from '@/api/university.js'
+import {getUniLawAidInfo,uniAcceptLawAid} from '@/api/lawAid.js'
+import Dialog from '@/components/Dialog.vue';
+const lawAidDialogRef=ref(null)
 const headerObj=reactive({
     token:getToken(),
 })
 
 const lawAidInfoPageUni=reactive({
-    curLawAid:2,
-    lawAidToConfirm:4,
-    totalLawAid:13
+    totalLawAids:[],
+    usersToConfirm:[],
+    userConfirmed:[],
+    recommendUsers:[],
 })
 
 const hasNoAvatar=ref(true)
@@ -158,32 +167,7 @@ const onUploadError=(res,file,fileList)=>{
 }
 
 
-const progress = [
-    {
-        name: 'testUser1',
-        latestOperation: '与求助人完成第1次电话通话',
-        area: '民间借贷',
-        latestOperationTime: '07-03 15:33',
-        status: 'normal',
-
-    },
-    {
-        name: 'testUser2',
-        latestOperation: '与求助人完成第1次线上见面',
-        area: '民间借贷',
-        latestOperationTime: '07-03 15:33',
-        status: 'urgent',
-
-
-    },
-    {
-        name: 'testUser3',
-        latestOperation: '与求助人完成第1次视频通话',
-        area: '民间借贷',
-        latestOperationTime: '07-03 15:33',
-        status: 'normal',
-    },
-]
+const progress = ref([])
 
 
 const tableRowClassName = ({
@@ -197,7 +181,24 @@ const tableRowClassName = ({
     return ''
 }
 
-onMounted(() => {
+const handleAcceptLawAid=(obj)=>{
+    confirmDec('确定接受法律援助申请吗?','warning','提示')
+        .then(async(res)=>{
+         const acceptOk=await uniAcceptLawAid(obj)
+         if(acceptOk.data.flag){
+            notif('接受成功，请尽快与用户联系','success')
+         }else{
+            notif('ooops','error')
+            console.log(acceptOk)
+         }
+        })
+}
+
+const handleLawAidDetailed=()=>[
+    lawAidDialogRef.value.openDialog()
+]
+
+onMounted(async() => {
   //挂载完之后，获取头像
   getAvatar()
      .then(res=>{
@@ -208,6 +209,12 @@ onMounted(() => {
         }
      })
 
+  //获取个人lawAid
+  const res1=await getUniLawAidInfo()
+  const realO=res1.data.data
+  console.log(realO)
+  Object.assign(lawAidInfoPageUni,realO)
+  progress.value=realO.userConfirmed
 })
 </script>
 
