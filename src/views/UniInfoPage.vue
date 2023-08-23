@@ -116,9 +116,9 @@
         <Dialog ref="lawAidOperationRef" title="处理法律援助">
             <div v-if="!isRouterView" class="flex flex-col items-center justify-center">
                 <div class="flex justify-between">
-                    <el-button type="primary" size="large" @click="handleSwitchPhone">开始电话联系</el-button>
-                    <el-button type="primary" size="large" @click="">交换联系方式</el-button>
-                    <el-button type="primary" size="large" @click="">请求交换资料</el-button>
+                    <el-button type="primary" size="large" @click="isRouterView=true;routerOption=0">开始电话联系</el-button>
+                    <el-button type="primary" size="large" @click="isRouterView=true;routerOption=1">交换联系方式</el-button>
+                    <el-button type="primary" size="large" @click="isRouterView=true;routerOption=2">请求交换资料</el-button>
                 </div>
                 <div  class="mt-7 w-4/5 flex justify-between items-center">
                     <el-input class="w-full" v-model="textarea"
@@ -132,15 +132,15 @@
             
             <div v-if="isRouterView">
                 <div v-if="routerOption==0">
-                    <div class="text-xl font-semibold">
-                        {{ computedPhone }}
+                    <div class="text-lg font-semibold">
+                        &nbsp;&nbsp;{{ computedPhone }}
                     </div>
                 </div>
-                <div v-if="routerOption==1">
-                    联系方式
+                <div class="text-lg font-semibold" v-if="routerOption==1">
+                    &nbsp;&nbsp;已经向用户申请交换联系方式，请留意系统邮箱。
                 </div>
-                <div v-if="routerOption==2">
-                    提交资料
+                <div class="text-lg font-semibold" v-if="routerOption==2">
+                    &nbsp;&nbsp;已经要求用户提交相关资料及进一步说明情况，请留意系统邮箱。
                 </div>
             </div>
         </Dialog>
@@ -166,15 +166,13 @@ const routerOption=ref(-1)
 const scopeIndex=ref(-1)
 const computedPhone=computed(()=>{
     if(!lawAidInfoPageUni.userConfirmed[scopeIndex.value].phone){
-        return '用户未提交电话信息，待用户填写后将通知您'
+        return '   用户未提交电话信息，待用户填写后将通知您，请留意系统邮箱。'
     }else{
         return lawAidInfoPageUni.userConfirmed[scopeIndex.value].phone
     }
 })
-const handleSwitchPhone=()=>{
-    isRouterView.value=true
-    routerOption.value=0
-}
+
+
 const headerObj = reactive({
     token: getToken(),
 })
