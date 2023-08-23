@@ -5,7 +5,7 @@
         <Logo></Logo>
       </div>
       <div class="header-button">
-        <el-button @click="likeArticle" class="like_article_button" :color="likeArticleColor">
+        <el-button @click="likeArticle" class="like_article_button" :color="likeArticleColor" :disabled="isButtonDisabled">
           <el-icon>
             <Lollipop />
           </el-icon>
@@ -43,11 +43,12 @@ import { buttonReset } from '@/composable/utils'
 import Logo from '@/components/Logo.vue'
 import service from "@/axios";
 import router from '@/router';
+import { v4 as uuidv4 } from 'uuid'
 const isFollow = ref(false)
 let likeArticleColor = ref<string>('')
 
 const emits = defineEmits(["openDrawer"])
-
+const isButtonDisabled = ref(false)
 const isShow = ref(false);
 const isFalse = ref(false);
 
@@ -92,21 +93,27 @@ const update = async () => {
 }
 const checkLikeArticle = async () => {
   const color = await service.get(`forum/article/check/like?id=${article.id}`)
-  if (color.data.data) return likeArticleColor.value = 'yellow'
+  if (color.data.data)  likeArticleColor.value = 'yellow'
+  else  likeArticleColor.value = ''
 }
+
 const likeArticle = async (e: any) => {
-  article.likeButtonDisabled = true;
+  const uuid  =  uuidv4();
+  // 先发送一个token
+  await service.post(`/forum/article/identifies?identifies=${uuid}`)
+  isButtonDisabled.value = true;
   if (likeArticleColor.value != 'yellow') {
-    await service.post(`/forum/article/like?id=${article.id}`)
+    await service.post(`/forum/article/like?id=${article.id}&identifies=${uuid}`)
     article.like++;
     likeArticleColor.value = 'yellow'
   } else {
-    await service.post(`/forum/article/unlike?id=${article.id}`)
+    await service.post(`/forum/article/unlike?id=${article.id}&identifies=${uuid}`)
     article.like--
     likeArticleColor.value = ''
   }
-  buttonReset(e)
-  article.likeButtonDisabled = false
+  setTimeout(() => {
+    isButtonDisabled.value = false
+  }, 300);
   buttonReset(e)
 }
 
@@ -320,7 +327,7 @@ const openDrawer = (e: any) => {
 }
 
 :deep(.single-show.v-note-show) {
-  height: 600px;
+  height: 84vh;
 }
 
 .content {

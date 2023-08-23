@@ -1,17 +1,1 @@
-{
-  "size": 5,
-  "query": {
-    "bool": {
-      "should": [
-        {
-          "match": {
-            "content": {
-              "query": "中国"
-            }
-          }
-        }
-      ]
-
-    }
-  }
-}
+{"uid":101690910259505001,"like":0,"createTime":1692527041000,"visited":0,"updateTime":1692527041000,"id":1693207250360180738,"title":"否","content":" 阿达"}

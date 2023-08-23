@@ -78,7 +78,7 @@ const article = reactive({
   likeButtonDisabled: false
 
 
-
+})
 const isShow = ref(false);
 onBeforeMount(async () => {
 
@@ -140,20 +140,23 @@ const checkLikeArticle = async () => {
   if (color.data.data) return 'yellow'
 }
 const likeArticle = async (e) => {
+  const uuid  = uuidv4();
+  // 先发送一个token
+  await service.post(`/forum/article/identifies?identifies=${uuid}`)
   article.likeButtonDisabled = true;
   if (likeArticleColor.value != 'yellow') {
-    await service.post(`/forum/article/like?id=${article.id}`).then(res => {
+    await service.post(`/forum/article/like?id=${article.id}&identifies=${uuid}`).then(res => {
       article.like++;
 
     })
   } else {
-    await service.post(`/forum/article/unlike?id=${article.id}`).then(res => {
+    await service.post(`/forum/article/unlike?id=${article.id}&identifies=${uuid}`).then(res => {
       article.like--
     })
   }
   article.likeButtonDisabled = false
   buttonReset(e)
-
+}
 
 
 
