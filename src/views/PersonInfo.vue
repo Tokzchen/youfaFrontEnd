@@ -122,6 +122,7 @@ import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
 import PersonAvatar from '@/components/account/PersonAvatar.vue'
 import { useUserStore } from '@/store'
+import {getCurrentInfo} from '@/composable/auth.js'
 const userStore=useUserStore()
 const router = useRouter()
 const userInfo = reactive({
@@ -230,12 +231,16 @@ const activities = ref([
 
 onMounted(async() => {
     //挂载完之后，获取头像,用户名等其他信息
+    const curInfo=getCurrentInfo()
+    userInfo.gender=curInfo.gender
+    userInfo.username=curInfo.username
     // userInfo.gender = userStore.userInfo.gender == '0' ? 'male' : 'female'
     // userInfo.username = userStore.userInfo.username == '' ? '未命名用户' : userStore.userInfo.username
     getLawAidInfoUser()
         .then(res => {
             
             const infoObj = res.data.data
+            console.log(infoObj)
             if (res.data.flag) {
                 userInfo.collageInTouch = infoObj.university == '' || infoObj.university == null ? '尚未选择' : res.data.data.university.uniName
                 userInfo.helpsCnt = infoObj.lawAidCnt
@@ -244,10 +249,11 @@ onMounted(async() => {
                 let newActivity = []
                 //遍历progress,根据progress生成activities
                 if (progress == null || progress.length == 0) {
-                    activities.value = []
+                    activities.value = []                 
                     return
                 } else {
-                    for (i = 0; i < progress.length; i++) {
+                    console.log(progress[0])
+                    for (let i = 0; i < progress.length; i++) {
                         const step = progress[i]
                         let activity = {
                             content: '目前所处位置',
@@ -274,7 +280,6 @@ onMounted(async() => {
                         newActivity.push(activity)
                     }
                     
-
                     activities.value = newActivity
 
                 }

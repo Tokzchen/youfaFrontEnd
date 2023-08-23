@@ -19,7 +19,7 @@ const uniList=ref([])
 const lawAidMainRef=ref(null)
 
 onMounted(async()=>{
- const locationInfo= getLoginLocation()
+ let locationInfo= getLoginLocation()
  if(locationInfo==null){
   const res=await Utils.getCurrentPosition()
   locationInfo={

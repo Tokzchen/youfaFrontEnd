@@ -63,6 +63,7 @@ onMounted(async() => {
     const handleUploadCompleted=async (url)=>{
         avatarUrl.value=url
         //向服务器请求更改头像url
+    console.log(url)
     const res = await props.pathApi({
             avatar:url,
         })
