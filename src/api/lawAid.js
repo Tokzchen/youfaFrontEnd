@@ -28,3 +28,8 @@ export const getUniLawAidInfo=()=>{
 export const uniAcceptLawAid=(obj)=>{
     return axios.post('/lawAid/university/accept',obj)
 }
+
+
+export const remindUser=(youfaMail)=>{
+    return axios.post('/lawAid/remind/user',youfaMail)
+}

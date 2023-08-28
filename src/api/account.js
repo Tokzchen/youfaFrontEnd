@@ -70,3 +70,12 @@ export const getAvatar= async ()=>{
 export const getUserInfo2=(obj)=>{
     return axios.post('/user/infos/email',obj)
 }
+
+
+export const getUserMails=()=>{
+    return axios.get('/user/get/mails')
+}
+
+export const checkUsermail=(id)=>{
+    return axios.get(`/user/check/mails/${id}`)
+}

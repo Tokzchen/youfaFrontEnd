@@ -154,6 +154,7 @@ import Verfify from '@/composable/verify.js'
 import { setToken,getToken,saveIdentity,saveCurrentInfo } from '@/composable/auth';
 import { useUserStore } from '@/store';
 import {getUniInfo} from '@/api/university.js'
+
 const userStore=useUserStore()
 const checkCodeUrl = ref(checkCodeApi)
 const router=useRouter()

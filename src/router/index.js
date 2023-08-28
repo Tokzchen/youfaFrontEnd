@@ -13,6 +13,7 @@ import UpdateArticlePage from '@/views/UpdateArticlePage.vue'
 import ForumReaderPage from '@/views/ForumReaderPage.vue'
 import LawAidApply from '@/views/LawAidApply.vue'
 import MyForumPageVue from '@/views/MyForumPage.vue'
+import YoufaMail from '@/views/YoufaMail.vue'
 const router = createRouter({
   // history: createWebHistory(import.meta.env.BASE_URL),
   history: createWebHashHistory(import.meta.env.BASH_URL),
@@ -67,6 +68,9 @@ const router = createRouter({
       path: '/userInfo',
       name: 'UserInfoPage',
       component: PersonInfo,
+      meta:{
+        keepAlive:true
+      }
     },
     {
       path: '/forum',
@@ -101,6 +105,12 @@ const router = createRouter({
       name: 'UserLawAidApply',
       component: LawAidApply
     },
+
+    {
+      path:'/mail',
+      name:'YoufaMail',
+      component:YoufaMail
+    }
 
 
 

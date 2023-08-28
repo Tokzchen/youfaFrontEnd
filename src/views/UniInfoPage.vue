@@ -113,7 +113,7 @@
                 <AidProcess :userId="inputUserId" />
             </div>
         </Dialog>
-        <Dialog ref="lawAidOperationRef" title="处理法律援助">
+        <Dialog @close="handleDialogClose" ref="lawAidOperationRef" title="处理法律援助">
             <div v-if="!isRouterView" class="flex flex-col items-center justify-center">
                 <div class="flex justify-between">
                     <el-button type="primary" size="large" @click="isRouterView=true;routerOption=0">开始电话联系</el-button>
@@ -128,7 +128,7 @@
                      <el-button class="ml-3" type="primary" size="large" @click="">提交其他操作</el-button>                    
                 </div>
             </div>
-            <el-button class="my-3" v-if="isRouterView" type="primary" size="small" @click="isRouterView=false">返回</el-button>
+            <el-button class="my-3" v-if="isRouterView" type="primary" size="small" @click="isRouterView=false;routerOption=-1">返回</el-button>
             
             <div v-if="isRouterView">
                 <div v-if="routerOption==0">
@@ -149,7 +149,7 @@
 
 <script setup>
 import PersonAvatar from '@/components/account/PersonAvatar.vue';
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted,watch } from 'vue'
 import { confirmDec, notif } from '@/composable/utils.js'
 import { getToken } from '@/composable/auth.js'
 import { getAvatar } from '@/api/university';
@@ -157,6 +157,9 @@ import { updateUniInfo } from '@/api/university.js'
 import { getUniLawAidInfo, uniAcceptLawAid } from '@/api/lawAid.js'
 import Dialog from '@/components/Dialog.vue';
 import AidProcess from '@/components/lawAid/AidProcess.vue';
+import { remindUser } from '@/api/lawAid.js';
+import router from '@/router';
+import { Console } from 'windicss/utils';
 const lawAidDialogRef = ref(null)
 const lawAidOperationRef = ref(null)
 const inputUserId = ref(null)
@@ -164,6 +167,49 @@ const textarea=ref('')
 const isRouterView=ref(false)
 const routerOption=ref(-1)
 const scopeIndex=ref(-1)
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return formattedDate;
+}
+
+watch(()=>routerOption.value,async (newValue,oldValue)=>{
+    let youfaMail={
+        sender:null,
+        receiver:lawAidInfoPageUni.userConfirmed[scopeIndex.value].userId,
+        content:null,
+        sendTime:formatDate(new Date()),
+    }
+    if(newValue==0){
+        //提醒用户完善资料
+        youfaMail.content=
+        '你申请的法律援助高校提醒你完善个人资料，\n请在个人信息页面进行资料的填写，\n否则将影响高校联系您'
+
+
+    }else if(newValue==1){
+        youfaMail.content='你申请的高校请求与您交换联系方式，请在聊天页面进行确认。\n确认完毕后将为你与高校生成会话窗口'
+
+    }else if(newValue==2){
+        youfaMail.content='你申请的高校需要进一步的资料，请先通过高校联系方式交换，然后向对方发送资料'
+    }
+
+   if(newValue!=-1){
+    const sendRes=await remindUser(youfaMail)
+   if(sendRes.data.flag){
+    notif('发送成功','success')
+   }else{
+    console.log(sendRes)
+    notif('连接服务器异常，请联系管理员','error')
+   }
+}
+
+})
 const computedPhone=computed(()=>{
     if(!lawAidInfoPageUni.userConfirmed[scopeIndex.value].phone){
         return '   用户未提交电话信息，待用户填写后将通知您，请留意系统邮箱。'
@@ -257,6 +303,10 @@ const handleLawAidDetailed = (index) => {
 const handleLawAidOperation = (index) => {
     scopeIndex.value=index
     lawAidOperationRef.value.openDialog()
+}
+
+const handleDialogClose=()=>{
+    routerOption.value=-1
 }
 
 

@@ -15,5 +15,10 @@ export default defineConfig({
   server:{
     hmr:true,
     port:3005,
+  },
+  devServer:{
+    proxy:{
+      ws:false
+    }
   }
 })

@@ -3,6 +3,7 @@
     v-model="dialogVisible"
     :title="title"
     :width="width"
+    @close="handleClose"
     
   >
      <slot>
@@ -28,10 +29,15 @@ defineProps({
         type:String,
     }
 })
+const emits=defineEmits(['close'])
 defineExpose({
     openDialog,
     closeDialog
 })
+
+const handleClose=()=>{
+  emits('close')
+}
 </script>
 
 <style lang="scss" scoped>

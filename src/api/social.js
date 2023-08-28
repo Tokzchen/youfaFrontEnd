@@ -10,5 +10,5 @@ export const getLawAidSocialInfoUser2=()=>{
 }
 
 export const getSocialPostsCnt=()=>{
-    return axios.get('/forum/article/get/count')
+    return axios.post('/forum/article/get/count')
 }

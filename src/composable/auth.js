@@ -5,7 +5,9 @@ const loginInfo='login_info'
 const location='login_location'
 const identity='login_identity'
 const curInfo='cur_info'
+const mailInfo='mail_info'
 const cookie=useCookies()
+const mailAge=60*30;
 const maxAge=60*60*24*3;
 const loacationAge=60*60*3;
 
@@ -75,5 +77,19 @@ export function saveCurrentInfo(obj){
 
 export function getCurrentInfo(){
     return cookie.get(curInfo)
+}
+
+export function setMailCache(youfaMails){
+    cookie.set(mailInfo,JSON.stringify(youfaMails),{
+        mailAge
+    })
+}
+
+export function getMailCache(){
+    return cookie.get(mailInfo)
+}
+
+export function removeMailCache(){
+    cookie.remove(mailInfo)
 }
 

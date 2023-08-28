@@ -2,7 +2,7 @@
     <div class="bg-blue-50 min-h-screen min-w-screen flex items-center justify-around">
         <div class="min-w-1/2 min-h-screen">
             <el-card shadow="never" :body-style="{ padding: '20px' }">
-                <div class="pageHeader flex">                   
+                <div class="pageHeader flex items-center">                   
                     <PersonAvatar/>
                     <div class="flex flex-col justify-center ml-3">
                         <div class="flex items-center">
@@ -16,7 +16,10 @@
                         </div>
                         <div class="text-xs">好友 {{ userInfo.friendsCnt }} &nbsp; &nbsp;粉丝 {{ userInfo.fansCnt }}</div>
                     </div>
-
+                    <div class="ml-auto relative">
+                        <el-icon @click="router.push('/mail')" class="text-3xl hover:bg-gray-100 cursor-pointer"><Message /></el-icon>
+                        <div v-if="youfaMailDTO.hasUnchecked" class=" absolute w-2 h-2 rounded-1 bg-red-500 right-0 top-[0.5px]"></div>
+                    </div>
                 </div>
                 <div class="sec-Header flex justify-between items-center mt-8">
                     <div>
@@ -93,7 +96,7 @@
             </el-card>
 
         </div>
-        <Dialog ref="dialogRef">
+        <Dialog @close="handleDialogClose" ref="dialogRef">
             <el-form :model="form" ref="form" :rules="rules" label-width="80px" :inline="false" size="normal">
                 <el-form-item label="新用户名">
                     <el-input v-model="userInfo.username"></el-input>
@@ -102,17 +105,16 @@
                     <el-button type="primary" @click="handleChangeName">更改</el-button>
                     <el-button class="ml-auto">取消</el-button>
                 </el-form-item>
-            </el-form>
-            
+            </el-form>    
         </Dialog>
-        
-
     </div>
+
+    <WebSocketMailServer @received="handleNewMessage" ref="webSocketMailServerRef"/>
 </template>
 <script setup>
 import { ref, reactive, onMounted ,toRef} from 'vue'
 import {  WarningFilled } from '@element-plus/icons-vue'
-import { getUserInfos,changeUserInfos,changeUserInfosAcc } from '@/api/account.js'
+import { getUserInfos,changeUserInfos,changeUserInfosAcc,getUserMails } from '@/api/account.js'
 import { getLawAidInfoUser } from '@/api/lawAid.js'
 import { getLawAidSocialInfoUser1,getLawAidSocialInfoUser2,getSocialPostsCnt } from '@/api/social.js'
 import NotFound from '@/components/NotFound.vue'
@@ -122,7 +124,12 @@ import{getLawAidArea} from '@/api/quiz.js'
 import Dialog from '@/components/Dialog.vue'
 import PersonAvatar from '@/components/account/PersonAvatar.vue'
 import { useUserStore } from '@/store'
-import {getCurrentInfo} from '@/composable/auth.js'
+import {getCurrentInfo,setMailCache,removeMailCache} from '@/composable/auth.js'
+import WebSocketServer from '@/composable/websocket'
+import { getToken } from '@/composable/auth.js'
+import WebSocketMailServer from '@/components/websocket/WebSocketMailServer.vue'
+const webSocketMailServerRef=ref(null)
+const hasUncheckedMail=ref(false)
 const userStore=useUserStore()
 const router = useRouter()
 const userInfo = reactive({
@@ -135,6 +142,11 @@ const userInfo = reactive({
     postCnt: 3,
     area: '民间借贷'
 
+})
+
+const youfaMailDTO=reactive({
+    hasUnchecked:false,
+    youfaMails:[],
 })
 
 const handleChangeArea=(item)=>{
@@ -180,6 +192,26 @@ const handlePageSwitch=(route,name)=>{
     }else{
         router.push(route)
     }
+}
+
+const handleNewMessage=(data)=>{
+    const mailNotice=JSON.parse(data)
+    console.log(mailNotice)
+    if(mailNotice.type=="0"){
+        //单点消息
+        notif('单点消息推送成功，提醒用户查看邮箱','success')
+        youfaMailDTO.hasUnchecked=true
+        //清楚缓存
+        removeMailCache()
+
+    }else if(mailNotice.type=="1"){
+        //公告
+        notif('公告消息提醒推送成功','success')
+    }
+}
+
+const handleDialogClose=()=>{
+    console.log('关闭...')
 }
 
 const items = [
@@ -234,8 +266,12 @@ onMounted(async() => {
     const curInfo=getCurrentInfo()
     userInfo.gender=curInfo.gender
     userInfo.username=curInfo.username
-    // userInfo.gender = userStore.userInfo.gender == '0' ? 'male' : 'female'
-    // userInfo.username = userStore.userInfo.username == '' ? '未命名用户' : userStore.userInfo.username
+    //连接websocket进行邮箱实时推送
+    const token=getToken()
+    webSocketMailServerRef.value.getConnection(token)
+    webSocketMailServerRef.value.WebSocketInit()
+
+
     getLawAidInfoUser()
         .then(res => {
             
@@ -313,6 +349,13 @@ onMounted(async() => {
     getSocialPostsCnt()
         .then(res=>{
            userInfo.postCnt=res.data.data
+        })
+
+    getUserMails()
+        .then(res=>{
+            youfaMailDTO.hasUnchecked=res.data.data.hasUnchecked
+            youfaMailDTO.youfaMails=res.data.data.youfaMails
+            setMailCache(youfaMailDTO.youfaMails)
         })
 
 })
